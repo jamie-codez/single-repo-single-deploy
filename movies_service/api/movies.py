@@ -1,5 +1,12 @@
 from fastapi import APIRouter, HTTPException
 from models.movie import Movie
+from services.movie_service import (
+    add_movie,
+    get_all_movies,
+    get_movie_by_id,
+    update_movie_by_id,
+    delete_movie_by_id,
+)
 from typing import List
 
 fake_movie_db = [
@@ -13,14 +20,18 @@ fake_movie_db = [
 
 movies = APIRouter()
 
+
 @movies.get(
     "/",
     description="Root of the API",
     response_model=List[Movie],
     status_code=200,
 )
-def get_movies() -> List[Movie]:
-    return fake_movie_db
+async def get_movies() -> List[Movie]:
+    movies = await get_all_movies()
+    if movies:
+        return movies
+    raise HTTPException(status_code=404, detail="No movies found")
 
 
 @movies.post(
@@ -29,10 +40,11 @@ def get_movies() -> List[Movie]:
     response_model=dict,
     status_code=201,
 )
-def create_movie(movie: Movie) -> dict:
-    movie = movie.dict()
-    fake_movie_db.append(movie)
-    return {"id": len(fake_movie_db) - 1}
+async def create_movie(movie: Movie) -> dict:
+    new_movie = await add_movie(movie)
+    if new_movie:
+        return {"message": "Movie created successfully."}
+    raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @movies.put(
@@ -41,11 +53,10 @@ def create_movie(movie: Movie) -> dict:
     response_model=dict,
     status_code=200,
 )
-def update_movie(movie_id: int, movie: Movie) -> dict:
-    movie = movie.dict()
-    if 0 <= movie_id <= len(fake_movie_db):
-        fake_movie_db[movie_id] = movie
-        return {"message": "Movie has been updated successfully."}
+async def update_movie(movie_id: int, movie: Movie) -> dict:
+    updated_movie = await update_movie_by_id(movie_id,movie)
+    if updated_movie:
+        return {"message": "Movie updated successfully."}
     raise HTTPException(status_code=404, detail="Movie not found")
 
 
@@ -55,9 +66,8 @@ def update_movie(movie_id: int, movie: Movie) -> dict:
     response_model=dict,
     status_code=200,
 )
-def delete_movie(movie_id: int) -> dict:
-    movie_length = len(fake_movie_db)
-    if 0 <= movie_id <= movie_length:
-        del fake_movie_db[movie_id]
-        return {"message": "Movie deleted successfully"}
+async def delete_movie(movie_id: int) -> dict:
+    deleted_movie = await delete_movie_by_id(movie_id)
+    if deleted_movie:
+        return {"message": "Movie deleted successfully."}
     raise HTTPException(status_code=404, detail="Movie not found")
