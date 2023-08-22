@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models.movie import Movie
+from models.movie import MovieOut, MovieIn, MovieUpdate
 from services.movie_service import (
     add_movie,
     get_all_movies,
@@ -24,10 +24,10 @@ movies = APIRouter()
 @movies.get(
     "/",
     description="Root of the API",
-    response_model=List[Movie],
+    response_model=List[MovieOut],
     status_code=200,
 )
-async def get_movies() -> List[Movie]:
+async def get_movies() -> List[MovieOut]:
     movies = await get_all_movies()
     if movies:
         return movies
@@ -40,7 +40,7 @@ async def get_movies() -> List[Movie]:
     response_model=dict,
     status_code=201,
 )
-async def create_movie(movie: Movie) -> dict:
+async def create_movie(movie: MovieIn) -> dict:
     new_movie = await add_movie(movie)
     if new_movie:
         return {"message": "Movie created successfully."}
@@ -53,7 +53,7 @@ async def create_movie(movie: Movie) -> dict:
     response_model=dict,
     status_code=200,
 )
-async def update_movie(movie_id: int, movie: Movie) -> dict:
+async def update_movie(movie_id: int, movie: MovieUpdate) -> dict:
     updated_movie = await update_movie_by_id(movie_id,movie)
     if updated_movie:
         return {"message": "Movie updated successfully."}
