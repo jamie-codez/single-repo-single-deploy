@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from api.movies import movies as movies_router
-from database.db import metadata, engine, database
+from db.db import metadata, engine, database
 
 metadata.create_all(engine)
 
-app = FastAPI()
+app = FastAPI(openapi_url="/api/v1/movies/openapi.json", docs_url="/api/v1/movies/docs")
 
 
 @app.on_event("startup")
