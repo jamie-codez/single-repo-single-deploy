@@ -1,4 +1,4 @@
-from fastapi import FastAPI,HTTPException
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 
@@ -52,9 +52,24 @@ def create_movie(movie: Movie) -> dict:
     response_model=dict,
     status_code=200,
 )
-def update_movie(movie_id: int, movie: Movie)->dict:
+def update_movie(movie_id: int, movie: Movie) -> dict:
     movie = movie.dict()
-    if 0 <= movie_id<=len(fake_movie_db):
+    if 0 <= movie_id <= len(fake_movie_db):
         fake_movie_db[movie_id] = movie
         return {"message": "Movie has been updated successfully."}
-    raise HTTPException(status_code=404,detail="Movie not found")
+    raise HTTPException(status_code=404, detail="Movie not found")
+
+
+@app.delete(
+    "/{movie_id}",
+    description="Delete a movie",
+    tags=["Delete"],
+    response_model=dict,
+    status_code=200,
+)
+def delete_movie(movie_id: int) -> dict:
+    movie_length = len(fake_movie_db)
+    if 0 <= movie_id <= movie_length:
+        del fake_movie_db[movie_id]
+        return {"message": "Movie deleted successfully"}
+    raise HTTPException(status_code=404, detail="Movie not found")
