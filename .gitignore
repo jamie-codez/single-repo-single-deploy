@@ -1,0 +1,6 @@
+movies_service/env
+movies_service/.env
+cast_service/env
+cast_service/.env
+database
+pgadmin
