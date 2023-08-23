@@ -1,1 +1,1 @@
-from .cast_service import get_cast,add_cast
+from .cast_service import get_cast_by_id,add_cast
