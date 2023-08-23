@@ -16,4 +16,4 @@ async def shutdown():
     await database.disconnect()
 
 
-app.include_router(cast_router,prefix="/api/v1/cast",tags=["Casts"])
+app.include_router(cast_router,prefix="/api/v1/casts",tags=["Casts"])
